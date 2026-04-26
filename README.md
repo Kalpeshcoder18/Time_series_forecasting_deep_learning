@@ -1,170 +1,151 @@
 # Time-Series Forecasting Pipeline — Roll 102317087
 
-> Course Lab Assignment | TIET  
-> Custom GRU-based time-series forecasting built from scratch using PyTorch
+Course Lab Assignment | TIET  
+Custom GRU-based time-series forecasting implemented from scratch using PyTorch
 
 ---
 
-##  Project Overview
+## Project Overview
 
-This project implements a complete time-series forecasting pipeline from scratch.
+This project implements a complete time-series forecasting pipeline to understand:
 
-The goal is to understand:
 - how sequence data is handled  
-- how models use past information  
-- where models fail and why  
+- how models learn from past values  
+- where models succeed and fail  
 
-Two datasets are used:
-
--  Electricity Dataset (noisy, irregular)
--  Temperature Dataset (smooth, seasonal)
+The pipeline is evaluated on two datasets with different characteristics.
 
 ---
 
-##  Models Implemented
+## Datasets Used
 
-| Model | Type |
-|------|------|
+Electricity Production Dataset  
+- Noisy and irregular  
+- Contains frequent fluctuations  
+- Difficult for sequence models  
+
+Temperature Dataset  
+- Smooth and seasonal  
+- Predictable patterns  
+- Easier to model  
+
+---
+
+## Models Implemented
+
+| Model | Description |
+|------|------------|
 | MLP | Baseline (no sequence awareness) |
-| Custom GRU | From scratch |
+| Custom GRU | Implemented from scratch |
 | LSTM | Prebuilt |
 | Transformer | Prebuilt |
 
 ---
 
-##  Personalized Parameters
+## Personalized Parameters
 
 Roll Number: 102317087  
 
-Digits: 1,0,2,3,1,7,0,8,7  
+Digits: 1, 0, 2, 3, 1, 7, 0, 8, 7  
 Sum = 29  
 
-| Parameter | Formula | Value |
-|----------|--------|-------|
-| window_size | (sum % 10) + 8 | 17 |
-| prediction_horizon | (last 2 digits % 3) + 1 | 1 |
-| hidden_size | (first 3 digits % 16) + 8 | 14 |
-| Model | Last digit odd | Custom GRU |
+| Parameter | Value |
+|----------|------|
+| window_size | 17 |
+| prediction_horizon | 1 |
+| hidden_size | 14 |
+| Assigned Model | Custom GRU |
 
 ---
 
-##  How It Works
+## Methodology
 
-### 1. Windowing
+Windowing converts time-series into supervised learning:
 
-Convert time-series into supervised learning:
+[10, 20, 30] → 40  
+[20, 30, 40] → 50  
 
-Example:
-
-[10,20,30] → 40  
-[20,30,40] → 50  
-
----
-
-### 2. Custom GRU
-
-GRU maintains memory using hidden state.
-
-Equations:
+Custom GRU maintains memory using gating mechanism:
 
 z = sigmoid(Wz [h, x])  
 r = sigmoid(Wr [h, x])  
 h~ = tanh(W [r*h, x])  
-h = (1-z)h + z h~  
+h = (1 - z)h + z h~  
+
+Train-test split is chronological (no shuffling) to avoid data leakage.
 
 ---
 
-### 3. MLP
+## Results — Electricity Dataset
 
-- Flattens input  
-- No sequence understanding  
+![Electricity Results](electricity_results.png)
 
----
+Observations:
 
-### 4. Train-Test Split
-
-Chronological split (no shuffle)
-
----
-
-##  Results
-
-### Electricity Dataset
-
-- Noisy and irregular  
-- Transformer performs best for small/medium window  
-- MLP performs best for large window  
-- GRU struggles due to noise  
+- Data is noisy and irregular  
+- MLP performs best (MSE ≈ 0.0187)  
+- Transformer captures fluctuations but is unstable  
+- GRU and LSTM struggle due to irregular patterns  
+- Sequence models fail to handle sudden spikes  
 
 ---
 
-### Temperature Dataset
+## Results — Temperature Dataset
 
-- Smooth and seasonal  
-- All models perform well  
-- GRU improves with larger window  
-- Differences are small  
+![Temperature Results](temperature_results.png)
 
----
+Observations:
 
-##  Ablation Study
-
-Window sizes tested:
-
-[8, 17, 34]
+- Data is smooth and seasonal  
+- All models perform similarly  
+- GRU and Transformer perform best (MSE ≈ 0.0077–0.0078)  
+- LSTM slightly worse but stable  
+- MLP performs well due to simple patterns  
 
 ---
 
-### Observations
-
-Electricity:
-- Small window → less context  
-- Large window → MLP best  
-- GRU struggles  
-
-Temperature:
-- Smooth data → all models good  
-- GRU best for large window  
-
----
-
-##  Failure Analysis
-
-1. Sudden spikes (electricity)  
-2. Noise in data  
-3. Long dependencies  
-
----
-
-##  Model Comparison
+## Model Comparison
 
 | Model | Strength | Weakness |
 |------|--------|----------|
-| MLP | simple, fast | no sequence |
-| GRU | memory | struggles with noise |
-| LSTM | long memory | slower |
-| Transformer | global attention | needs tuning |
+| MLP | simple, fast | no temporal understanding |
+| GRU | captures sequence patterns | sensitive to noise |
+| LSTM | better memory | slower, can oversmooth |
+| Transformer | global attention | unstable on noisy data |
 
 ---
 
-##  Final Conclusion
+## Failure Analysis
 
-Electricity dataset is noisy → models struggle  
-Temperature dataset is smooth → models perform well  
+Electricity Dataset:
+- Sudden spikes are unpredictable  
+- High noise disrupts learning  
 
-Model performance depends on:
-- data type  
-- window size  
+Temperature Dataset:
+- Minor lag in peak prediction  
+- Slight smoothing of sharp changes  
 
 ---
 
-##  How to Run
+## Final Conclusion
+
+Model performance depends on dataset characteristics.
+
+- Electricity dataset is noisy → MLP performs best  
+- Temperature dataset is smooth → all models perform well  
+- Sequence models struggle with noise but perform well on patterns  
+- Transformer captures global relationships but requires tuning  
+
+---
+
+## How to Run
 
 pip install torch numpy pandas matplotlib scikit-learn  
 
+
 ---
 
-##  Dependencies
+## Dependencies
 
 torch  
 numpy  
