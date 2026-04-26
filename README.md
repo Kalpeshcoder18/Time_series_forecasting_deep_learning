@@ -131,7 +131,7 @@ Temperature Dataset:
 
 Model performance depends on dataset characteristics.
 
-- Electricity dataset → LSTM performs best  
+- Electricity dataset is noisy → MLP performs best  
 - Temperature dataset is smooth → all models perform well  
 - Sequence models struggle with noise but perform well on patterns  
 - Transformer captures global relationships but requires tuning  
